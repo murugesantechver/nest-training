@@ -53,6 +53,7 @@ export class UsersService {
 
     return this.userModel.findOne({
       where: { id },
+      attributes: { exclude: ['password'] },
     });
   }
 
