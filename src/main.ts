@@ -6,6 +6,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { LoggerService } from './infrastructure/logger/logger.service';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/role.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,7 +18,10 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   // 🔹 Global JWT Auth Guard
-  app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
+  app.useGlobalGuards(
+  new JwtAuthGuard(app.get(Reflector)),
+  new RolesGuard(app.get(Reflector)),
+);
 
   // 🔹 Global Validation Pipe
   app.useGlobalPipes(

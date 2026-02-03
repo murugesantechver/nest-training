@@ -6,6 +6,7 @@ import { CreationAttributes } from 'sequelize';
 import { RedisService } from 'src/infrastructure/redis/redis.service';
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
 import { successResponse } from 'src/common/utils/response.util';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -58,11 +59,27 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto) {
-    const user = await this.userModel.create(dto as CreationAttributes<User>);
+    const existingUser = await this.userModel.findOne({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('Email already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.userModel.create({
+      ...(dto as CreationAttributes<User>),
+      password: hashedPassword,
+    });
 
     // 🔥 Cache invalidation (VERY IMPORTANT)
     await this.redisService.del(this.USERS_CACHE_KEY);
 
-    return user;
+    return successResponse(
+      { id: user.id, email: user.email },
+      'User registered successfully',
+    );
   }
 }

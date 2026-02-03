@@ -8,9 +8,10 @@ import {
 } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 
-
-export interface UserCreationAttributes
-  extends Optional<User, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface UserCreationAttributes extends Optional<
+  User,
+  'id' | 'createdAt' | 'updatedAt'
+> {}
 
 @Table({
   tableName: 'users',
@@ -42,6 +43,13 @@ export class User extends Model<User, UserCreationAttributes> {
     allowNull: false,
   })
   declare password: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    defaultValue: 'user', // user | admin | manager
+  })
+  declare role: string;
 
   @CreatedAt
   declare createdAt: Date;
