@@ -19,9 +19,9 @@ async function bootstrap() {
 
   // 🔹 Global JWT Auth Guard
   app.useGlobalGuards(
-  new JwtAuthGuard(app.get(Reflector)),
-  new RolesGuard(app.get(Reflector)),
-);
+    new JwtAuthGuard(app.get(Reflector)),
+    new RolesGuard(app.get(Reflector)),
+  );
 
   // 🔹 Global Validation Pipe
   app.useGlobalPipes(
@@ -43,9 +43,19 @@ async function bootstrap() {
     .setTitle('My Hotel API')
     .setDescription('Enterprise Hotel Management APIs')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'bearerAuth',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
+  document.security = [{ bearerAuth: [] }];
   SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
 
   // 🔹 Logger and Global Exception Filter
