@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
-import { ProductsModule } from './products/products.module';
+import { UsersModule } from './features/users/users.module';
+import { ProductsModule } from './features/products/products.module';
 import { ConfigModule, /*ConfigService*/ } from '@nestjs/config';
 // import { SequelizeModule } from '@nestjs/sequelize';
-import { TestModModule } from './test-mod/test-mod.module';
+import { TestModModule } from './features/test-mod/test-mod.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { LoggerModule } from './infrastructure/logger/logger.module';

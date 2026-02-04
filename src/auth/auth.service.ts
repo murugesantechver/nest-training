@@ -3,8 +3,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/models/user.model';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { User } from 'src/features/users/models/user.model';
+import { CreateUserDto } from 'src/features/users/dto/create-user.dto';
 import { successResponse } from 'src/common/utils/response.util';
 import { CreationAttributes } from 'sequelize';
 

@@ -1,7 +1,7 @@
 // src/auth/auth.controller.ts
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto } from 'src/features/users/dto/create-user.dto';
 import {  ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './login.dto';
 import { Public } from 'src/common/decorators/public.decorator';
