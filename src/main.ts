@@ -1,19 +1,36 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { LoggerService } from './infrastructure/logger/logger.service';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/role.guard';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule,{
+  const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
 
   const globalPrefix = 'my-hotel/api';
   // 🔹 Global API prefix
-  app.setGlobalPrefix( globalPrefix );
+  app.setGlobalPrefix(globalPrefix);
+
+  // 🔹 Global JWT Auth Guard
+  app.useGlobalGuards(
+  new JwtAuthGuard(app.get(Reflector)),
+  new RolesGuard(app.get(Reflector)),
+);
+
+  // 🔹 Global Validation Pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // 🔹 Enable URL-based versioning
   app.enableVersioning({
@@ -28,28 +45,16 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
 
-
-  app.useGlobalPipes(new ValidationPipe(
-    {
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }
-  ));
-
-
+  // 🔹 Logger and Global Exception Filter
   const logger = app.get(LoggerService);
   app.useLogger(logger);
 
+  // 🔹 Global Exception Filter
   app.useGlobalFilters(new AllExceptionsFilter(logger));
-  
 
-  
   await app.listen(process.env.PORT ?? 5000);
 }
 bootstrap();
